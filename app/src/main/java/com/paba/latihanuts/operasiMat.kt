@@ -1,5 +1,6 @@
 package com.paba.latihanuts
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -23,6 +24,20 @@ class operasiMat : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    interface OperationClickListener {
+        fun onOperationSelected(operation: String)
+    }
+    private var operationClickListener: OperationClickListener? = null
+
+    override fun onAttach (context: Context){
+        super.onAttach(context)
+        if (context is OperationClickListener) {
+            operationClickListener = context
+        } else {
+            throw RuntimeException("$context must implement OperationClickListener")
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,31 +58,17 @@ class operasiMat : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val mainActivity = activity as MainActivity
-        val buttonMultiply: Button = view.findViewById(R.id.btnKali)
-        val buttonDivide: Button = view.findViewById(R.id.btnBagi)
+        val btnkali: Button = view.findViewById(R.id.btnKali)
+        val btnbagi: Button = view.findViewById(R.id.btnBagi)
 
-        buttonMultiply.setOnClickListener {
-            mainActivity.performOperation("*")
+        btnkali.setOnClickListener {
+            operationClickListener?.onOperationSelected("*")
         }
 
-        buttonDivide.setOnClickListener {
-            mainActivity.performOperation("/")
+        btnbagi.setOnClickListener {
+            operationClickListener?.onOperationSelected("/")
         }
     }
-
-        private fun hitungDanTampilkan(operator: String, tvOperasi: TextView) {
-            val angka1 = (activity?.findViewById<EditText>(R.id.editAngka1)?.text?.toString()?.toIntOrNull()) ?: 0
-            val angka2 = (activity?.findViewById<EditText>(R.id.editAngka2)?.text?.toString()?.toIntOrNull()) ?: 0
-
-            val hasil = when (operator) {
-                "*" -> angka1 * angka2
-                "/" -> if (angka2 != 0) angka1 / angka2 else 0
-                else -> 0
-            }
-
-            tvOperasi.text = "Operasi Matematika\n$angka1 $operator $angka2 = $hasil"
-            activity?.findViewById<TextView>(R.id.tvHasil)?.text = "HASIL = $hasil"
-        }
 
 
 

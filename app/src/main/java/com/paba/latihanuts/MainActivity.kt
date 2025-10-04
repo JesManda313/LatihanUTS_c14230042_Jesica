@@ -10,11 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , operasiMat.OperationClickListener{
     private lateinit var editText1: EditText
     private lateinit var editText2: EditText
     private lateinit var btnTambah: Button
-    private lateinit var textResult: TextView
+    private lateinit var tvHasil: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         editText1 = findViewById(R.id.editAngka1)
         editText2 = findViewById(R.id.editAngka2)
         btnTambah = findViewById(R.id.btnTambah)
-        textResult = findViewById(R.id.textResult)
+        tvHasil = findViewById(R.id.tvHasil)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, operasiMat())
@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
             performOperation("+")
         }
     }
+
+
     fun performOperation(operator: String) {
         val num1Str = editText1.text.toString()
         val num2Str = editText2.text.toString()
@@ -55,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         when (operator) {
             "+" -> {
                 result = num1 + num2
+                operationDetailText = "Operasi Matematika\n$num1 + $num2"
             }
 
             "*" -> {
@@ -71,18 +74,20 @@ class MainActivity : AppCompatActivity() {
                 operationDetailText = "Operasi Matematika\n$num1 / $num2"
             }
         }
-        textResult.text = "HASIL\n${result.toString()}"
+        tvHasil.text = "HASIL\n${result.toString()}"
 
 
-        if (operator == "*" || operator == "/") {
-            val fragmentManager = supportFragmentManager
-            val fragmentTransaction = fragmentManager.beginTransaction()
 
-            val detailFragment = operationDetailFragment.newInstance(operationDetailText)
+        val detailFragment = operationDetailFragment.newInstance(operationDetailText)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, detailFragment)
+            .addToBackStack(null)
+            .commit()
 
-            fragmentTransaction.replace(R.id.fragment_container, detailFragment)
-            fragmentTransaction.addToBackStack(null) // Penting agar bisa di-back
-            fragmentTransaction.commit()
-        }
+    }
+
+    override fun onOperationSelected(operation: String) {
+        performOperation(operation)
+
     }
 }
